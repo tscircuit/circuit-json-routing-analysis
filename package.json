@@ -9,6 +9,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.7",
+		"@tscircuit/capacity-autorouter": "^0.0.336",
 		"@types/bun": "latest",
 		"tscircuit": "^0.0.1520",
 		"tsup": "^8.5.1"
