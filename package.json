@@ -1,12 +1,19 @@
 {
-  "name": "circuit-json-routing-analysis",
-  "module": "index.ts",
-  "type": "module",
-  "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  }
+	"name": "@tscircuit/circuit-json-routing-analysis",
+	"main": "dist/index.js",
+	"type": "module",
+	"scripts": {
+		"build": "tsup ./lib/index.ts --dts --format esm",
+		"format": "biome format --write .",
+		"format:check": "biome format ."
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.7",
+		"@types/bun": "latest",
+		"tscircuit": "^0.0.1520",
+		"tsup": "^8.5.1"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
 }
