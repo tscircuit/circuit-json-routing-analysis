@@ -22,16 +22,71 @@ export interface RoutingCapacityNode {
 }
 
 export interface Bounds {
-  min_x: number
-  max_x: number
-  min_y: number
-  max_y: number
+  minX: number
+  maxX: number
+  minY: number
+  maxY: number
 }
 
+export interface NearbyComponentWithinBounds {
+  name: string
+  containedWithinBounds: true
+  minX: number
+  maxX: number
+  minY: number
+  maxY: number
+}
+
+export interface NearbyComponentOnRegionEdge {
+  name: string
+  onLeftEdgeOfRegion?: true
+  onRightEdgeOfRegion?: true
+  onTopEdgeOfRegion?: true
+  onBottomEdgeOfRegion?: true
+  minX: number
+  maxX: number
+  minY: number
+  maxY: number
+}
+
+export interface NearbyComponentRegionWithinComponent {
+  name: string
+  regionWithinComponent: true
+  minX: number
+  maxX: number
+  minY: number
+  maxY: number
+}
+
+export interface NearbyComponentOffsetFromRegion {
+  name: string
+  onLeftEdgeOfRegion?: true
+  onRightEdgeOfRegion?: true
+  onTopEdgeOfRegion?: true
+  onBottomEdgeOfRegion?: true
+  minX: number
+  maxX: number
+  minY: number
+  maxY: number
+  offsetFromLeftEdgeOfRegion?: string
+  offsetFromRightEdgeOfRegion?: string
+  offsetFromTopEdgeOfRegion?: string
+  offsetFromBottomEdgeOfRegion?: string
+}
+
+export type NearbyComponent =
+  | NearbyComponentWithinBounds
+  | NearbyComponentOnRegionEdge
+  | NearbyComponentRegionWithinComponent
+  | NearbyComponentOffsetFromRegion
+
 export interface CongestedRegion {
-  line_item_type: "CongestedRegion"
-  probability_of_failure: number
+  lineItemType: "CongestedRegion"
+  probabilityOfFailure: string
   bounds: Bounds
+  width: number
+  height: number
+  nearbyComponents: NearbyComponent[]
 }
 
 export type AnalysisLineItem = CongestedRegion
