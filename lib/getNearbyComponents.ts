@@ -31,10 +31,10 @@ type OutsideComponentCandidate = {
   onRightEdgeOfRegion?: true
   onTopEdgeOfRegion?: true
   onBottomEdgeOfRegion?: true
-  offsetFromLeftEdgeOfRegion?: string
-  offsetFromRightEdgeOfRegion?: string
-  offsetFromTopOfRegion?: string
-  offsetFromBottomOfRegion?: string
+  distToLeftEdgeOfRegion?: string
+  distToRightEdgeOfRegion?: string
+  distToTopOfRegion?: string
+  distToBottomOfRegion?: string
 }
 
 const fmtMm = (value: number): string => `${value.toFixed(1)}mm`
@@ -143,11 +143,11 @@ const addEdgeAlignedOffsets = (
     nearbyComponent.onLeftEdgeOfRegion ||
     nearbyComponent.onRightEdgeOfRegion
   ) {
-    nearbyComponent.offsetFromTopOfRegion = getOffsetFromTopOfRegion(
+    nearbyComponent.distToTopOfRegion = getOffsetFromTopOfRegion(
       componentBounds,
       regionBounds,
     )
-    nearbyComponent.offsetFromBottomOfRegion = getOffsetFromBottomOfRegion(
+    nearbyComponent.distToBottomOfRegion = getOffsetFromBottomOfRegion(
       componentBounds,
       regionBounds,
     )
@@ -157,11 +157,11 @@ const addEdgeAlignedOffsets = (
     nearbyComponent.onTopEdgeOfRegion ||
     nearbyComponent.onBottomEdgeOfRegion
   ) {
-    nearbyComponent.offsetFromLeftEdgeOfRegion = getOffsetFromLeftOfRegion(
+    nearbyComponent.distToLeftEdgeOfRegion = getOffsetFromLeftOfRegion(
       componentBounds,
       regionBounds,
     )
-    nearbyComponent.offsetFromRightEdgeOfRegion = getOffsetFromRightOfRegion(
+    nearbyComponent.distToRightEdgeOfRegion = getOffsetFromRightOfRegion(
       componentBounds,
       regionBounds,
     )
@@ -182,8 +182,8 @@ const getDirectionsToExclude = (component: NearbyComponent): Direction[] => {
   } else if (component.onRightEdgeOfRegion) {
     directions.push("left")
   } else if (!hasVerticalEdge) {
-    if (component.offsetFromLeftEdgeOfRegion) directions.push("right")
-    if (component.offsetFromRightEdgeOfRegion) directions.push("left")
+    if (component.distToLeftEdgeOfRegion) directions.push("right")
+    if (component.distToRightEdgeOfRegion) directions.push("left")
   }
 
   if (component.onTopEdgeOfRegion) {
@@ -191,8 +191,8 @@ const getDirectionsToExclude = (component: NearbyComponent): Direction[] => {
   } else if (component.onBottomEdgeOfRegion) {
     directions.push("top")
   } else if (!hasHorizontalEdge) {
-    if (component.offsetFromTopOfRegion) directions.push("bottom")
-    if (component.offsetFromBottomOfRegion) directions.push("top")
+    if (component.distToTopOfRegion) directions.push("bottom")
+    if (component.distToBottomOfRegion) directions.push("top")
   }
 
   return directions
@@ -222,9 +222,9 @@ const addFreeSpace = (
   if (freeSpaceByDirection.right)
     nearbyComponent.freeSpaceOnRight = freeSpaceByDirection.right
   if (freeSpaceByDirection.top)
-    nearbyComponent.freeSpaceOnTop = freeSpaceByDirection.top
+    nearbyComponent.freeSpaceAbove = freeSpaceByDirection.top
   if (freeSpaceByDirection.bottom)
-    nearbyComponent.freeSpaceOnBottom = freeSpaceByDirection.bottom
+    nearbyComponent.freeSpaceBelow = freeSpaceByDirection.bottom
 
   return nearbyComponent
 }
@@ -332,7 +332,7 @@ const getOutsideComponentCandidate = (
         if (roundsToZeroMm(candidate.distance)) {
           nearbyComponentCandidate.onLeftEdgeOfRegion = true
         } else {
-          nearbyComponentCandidate.offsetFromLeftEdgeOfRegion = fmtMm(
+          nearbyComponentCandidate.distToLeftEdgeOfRegion = fmtMm(
             candidate.distance,
           )
         }
@@ -341,7 +341,7 @@ const getOutsideComponentCandidate = (
         if (roundsToZeroMm(candidate.distance)) {
           nearbyComponentCandidate.onRightEdgeOfRegion = true
         } else {
-          nearbyComponentCandidate.offsetFromRightEdgeOfRegion = fmtMm(
+          nearbyComponentCandidate.distToRightEdgeOfRegion = fmtMm(
             candidate.distance,
           )
         }
@@ -350,16 +350,14 @@ const getOutsideComponentCandidate = (
         if (roundsToZeroMm(candidate.distance)) {
           nearbyComponentCandidate.onTopEdgeOfRegion = true
         } else {
-          nearbyComponentCandidate.offsetFromTopOfRegion = fmtMm(
-            candidate.distance,
-          )
+          nearbyComponentCandidate.distToTopOfRegion = fmtMm(candidate.distance)
         }
         break
       case "bottom":
         if (roundsToZeroMm(candidate.distance)) {
           nearbyComponentCandidate.onBottomEdgeOfRegion = true
         } else {
-          nearbyComponentCandidate.offsetFromBottomOfRegion = fmtMm(
+          nearbyComponentCandidate.distToBottomOfRegion = fmtMm(
             candidate.distance,
           )
         }
@@ -386,28 +384,26 @@ const getOutsideComponentCandidate = (
       ...(nearbyComponentCandidate.onBottomEdgeOfRegion
         ? { onBottomEdgeOfRegion: true as const }
         : {}),
-      ...(nearbyComponentCandidate.offsetFromLeftEdgeOfRegion
+      ...(nearbyComponentCandidate.distToLeftEdgeOfRegion
         ? {
-            offsetFromLeftEdgeOfRegion:
-              nearbyComponentCandidate.offsetFromLeftEdgeOfRegion,
+            distToLeftEdgeOfRegion:
+              nearbyComponentCandidate.distToLeftEdgeOfRegion,
           }
         : {}),
-      ...(nearbyComponentCandidate.offsetFromRightEdgeOfRegion
+      ...(nearbyComponentCandidate.distToRightEdgeOfRegion
         ? {
-            offsetFromRightEdgeOfRegion:
-              nearbyComponentCandidate.offsetFromRightEdgeOfRegion,
+            distToRightEdgeOfRegion:
+              nearbyComponentCandidate.distToRightEdgeOfRegion,
           }
         : {}),
-      ...(nearbyComponentCandidate.offsetFromTopOfRegion
+      ...(nearbyComponentCandidate.distToTopOfRegion
         ? {
-            offsetFromTopOfRegion:
-              nearbyComponentCandidate.offsetFromTopOfRegion,
+            distToTopOfRegion: nearbyComponentCandidate.distToTopOfRegion,
           }
         : {}),
-      ...(nearbyComponentCandidate.offsetFromBottomOfRegion
+      ...(nearbyComponentCandidate.distToBottomOfRegion
         ? {
-            offsetFromBottomOfRegion:
-              nearbyComponentCandidate.offsetFromBottomOfRegion,
+            distToBottomOfRegion: nearbyComponentCandidate.distToBottomOfRegion,
           }
         : {}),
     },
@@ -474,23 +470,21 @@ export const getNearbyComponents = (
           ...(component.onBottomEdgeOfRegion
             ? { onBottomEdgeOfRegion: true as const }
             : {}),
-          ...(component.offsetFromLeftEdgeOfRegion
+          ...(component.distToLeftEdgeOfRegion
             ? {
-                offsetFromLeftEdgeOfRegion:
-                  component.offsetFromLeftEdgeOfRegion,
+                distToLeftEdgeOfRegion: component.distToLeftEdgeOfRegion,
               }
             : {}),
-          ...(component.offsetFromRightEdgeOfRegion
+          ...(component.distToRightEdgeOfRegion
             ? {
-                offsetFromRightEdgeOfRegion:
-                  component.offsetFromRightEdgeOfRegion,
+                distToRightEdgeOfRegion: component.distToRightEdgeOfRegion,
               }
             : {}),
-          ...(component.offsetFromTopOfRegion
-            ? { offsetFromTopOfRegion: component.offsetFromTopOfRegion }
+          ...(component.distToTopOfRegion
+            ? { distToTopOfRegion: component.distToTopOfRegion }
             : {}),
-          ...(component.offsetFromBottomOfRegion
-            ? { offsetFromBottomOfRegion: component.offsetFromBottomOfRegion }
+          ...(component.distToBottomOfRegion
+            ? { distToBottomOfRegion: component.distToBottomOfRegion }
             : {}),
         },
         component.componentIndex,

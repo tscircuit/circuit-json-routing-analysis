@@ -67,13 +67,7 @@ const getProbabilityOfFailure = (
 }
 
 const nearbyComponentToString = (component: NearbyComponent): string => {
-  const attrs = [
-    `name="${component.name}"`,
-    `minX="${fmtMm(component.minX)}"`,
-    `maxX="${fmtMm(component.maxX)}"`,
-    `minY="${fmtMm(component.minY)}"`,
-    `maxY="${fmtMm(component.maxY)}"`,
-  ]
+  const attrs = [`name="${component.name}"`]
 
   if (component.containedWithinBounds) attrs.push("containedWithinBounds")
   if (component.regionWithinComponent) attrs.push("regionWithinComponent")
@@ -82,23 +76,17 @@ const nearbyComponentToString = (component: NearbyComponent): string => {
   if (component.onTopEdgeOfRegion) attrs.push("onTopEdgeOfRegion")
   if (component.onBottomEdgeOfRegion) attrs.push("onBottomEdgeOfRegion")
 
-  if (component.offsetFromLeftEdgeOfRegion) {
-    attrs.push(
-      `offsetFromLeftEdgeOfRegion="${component.offsetFromLeftEdgeOfRegion}"`,
-    )
+  if (component.distToLeftEdgeOfRegion) {
+    attrs.push(`distToLeftEdgeOfRegion="${component.distToLeftEdgeOfRegion}"`)
   }
-  if (component.offsetFromRightEdgeOfRegion) {
-    attrs.push(
-      `offsetFromRightEdgeOfRegion="${component.offsetFromRightEdgeOfRegion}"`,
-    )
+  if (component.distToRightEdgeOfRegion) {
+    attrs.push(`distToRightEdgeOfRegion="${component.distToRightEdgeOfRegion}"`)
   }
-  if (component.offsetFromTopOfRegion) {
-    attrs.push(`offsetFromTopOfRegion="${component.offsetFromTopOfRegion}"`)
+  if (component.distToTopOfRegion) {
+    attrs.push(`distToTopOfRegion="${component.distToTopOfRegion}"`)
   }
-  if (component.offsetFromBottomOfRegion) {
-    attrs.push(
-      `offsetFromBottomOfRegion="${component.offsetFromBottomOfRegion}"`,
-    )
+  if (component.distToBottomOfRegion) {
+    attrs.push(`distToBottomOfRegion="${component.distToBottomOfRegion}"`)
   }
 
   if (component.freeSpaceOnLeft) {
@@ -107,12 +95,19 @@ const nearbyComponentToString = (component: NearbyComponent): string => {
   if (component.freeSpaceOnRight) {
     attrs.push(`freeSpaceOnRight="${component.freeSpaceOnRight}"`)
   }
-  if (component.freeSpaceOnTop) {
-    attrs.push(`freeSpaceOnTop="${component.freeSpaceOnTop}"`)
+  if (component.freeSpaceAbove) {
+    attrs.push(`freeSpaceAbove="${component.freeSpaceAbove}"`)
   }
-  if (component.freeSpaceOnBottom) {
-    attrs.push(`freeSpaceOnBottom="${component.freeSpaceOnBottom}"`)
+  if (component.freeSpaceBelow) {
+    attrs.push(`freeSpaceBelow="${component.freeSpaceBelow}"`)
   }
+
+  attrs.push(
+    `left="${fmtMm(component.minX)}"`,
+    `right="${fmtMm(component.maxX)}"`,
+    `bottom="${fmtMm(component.minY)}"`,
+    `top="${fmtMm(component.maxY)}"`,
+  )
 
   return `    <NearbyComponent ${attrs.join(" ")} />`
 }
@@ -121,7 +116,7 @@ const lineItemToString = (lineItem: AnalysisLineItem): string => {
   switch (lineItem.lineItemType) {
     case "CongestedRegion":
       return [
-        `<CongestedRegion probabilityOfFailure="${lineItem.probabilityOfFailure}" minX="${fmtMm(lineItem.bounds.minX)}" maxX="${fmtMm(lineItem.bounds.maxX)}" minY="${fmtMm(lineItem.bounds.minY)}" maxY="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
+        `<CongestedRegion probabilityOfFailure="${lineItem.probabilityOfFailure}" left="${fmtMm(lineItem.bounds.minX)}" right="${fmtMm(lineItem.bounds.maxX)}" bottom="${fmtMm(lineItem.bounds.minY)}" top="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
         ...lineItem.nearbyComponents.map(nearbyComponentToString),
         "</CongestedRegion>",
       ].join("\n")

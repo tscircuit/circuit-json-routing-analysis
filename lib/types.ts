@@ -40,14 +40,14 @@ export interface NearbyComponent {
   onRightEdgeOfRegion?: true
   onTopEdgeOfRegion?: true
   onBottomEdgeOfRegion?: true
-  offsetFromLeftEdgeOfRegion?: string
-  offsetFromRightEdgeOfRegion?: string
-  offsetFromTopOfRegion?: string
-  offsetFromBottomOfRegion?: string
+  distToLeftEdgeOfRegion?: string
+  distToRightEdgeOfRegion?: string
+  distToTopOfRegion?: string
+  distToBottomOfRegion?: string
   freeSpaceOnLeft?: string
   freeSpaceOnRight?: string
-  freeSpaceOnTop?: string
-  freeSpaceOnBottom?: string
+  freeSpaceAbove?: string
+  freeSpaceBelow?: string
 }
 
 export interface CongestedRegion {
