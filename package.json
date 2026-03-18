@@ -16,5 +16,8 @@
 	},
 	"peerDependencies": {
 		"typescript": "^5"
+	},
+	"dependencies": {
+		"flatbush": "^4.5.1"
 	}
 }

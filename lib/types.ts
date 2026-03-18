@@ -28,57 +28,27 @@ export interface Bounds {
   maxY: number
 }
 
-export interface NearbyComponentWithinBounds {
+export interface NearbyComponent {
   name: string
-  containedWithinBounds: true
   minX: number
   maxX: number
   minY: number
   maxY: number
-}
-
-export interface NearbyComponentOnRegionEdge {
-  name: string
+  containedWithinBounds?: true
+  regionWithinComponent?: true
   onLeftEdgeOfRegion?: true
   onRightEdgeOfRegion?: true
   onTopEdgeOfRegion?: true
   onBottomEdgeOfRegion?: true
-  minX: number
-  maxX: number
-  minY: number
-  maxY: number
-}
-
-export interface NearbyComponentRegionWithinComponent {
-  name: string
-  regionWithinComponent: true
-  minX: number
-  maxX: number
-  minY: number
-  maxY: number
-}
-
-export interface NearbyComponentOffsetFromRegion {
-  name: string
-  onLeftEdgeOfRegion?: true
-  onRightEdgeOfRegion?: true
-  onTopEdgeOfRegion?: true
-  onBottomEdgeOfRegion?: true
-  minX: number
-  maxX: number
-  minY: number
-  maxY: number
   offsetFromLeftEdgeOfRegion?: string
   offsetFromRightEdgeOfRegion?: string
-  offsetFromTopEdgeOfRegion?: string
-  offsetFromBottomEdgeOfRegion?: string
+  offsetFromTopOfRegion?: string
+  offsetFromBottomOfRegion?: string
+  freeSpaceOnLeft?: string
+  freeSpaceOnRight?: string
+  freeSpaceOnTop?: string
+  freeSpaceOnBottom?: string
 }
-
-export type NearbyComponent =
-  | NearbyComponentWithinBounds
-  | NearbyComponentOnRegionEdge
-  | NearbyComponentRegionWithinComponent
-  | NearbyComponentOffsetFromRegion
 
 export interface CongestedRegion {
   lineItemType: "CongestedRegion"
