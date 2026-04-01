@@ -2,6 +2,8 @@
 
 Analyze a `circuit-json` PCB and report congested routing regions.
 
+Used for `tscircuit check routing-analysis`
+
 ## Install
 
 ```bash
