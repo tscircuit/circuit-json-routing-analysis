@@ -195,26 +195,24 @@ const createNearbyComponent = (
     component.bounds,
     regionBounds,
   )
-  const relation = overlapDepthMm > 0 ? "overlapping" : "nearby"
+  const overlapsRegion = overlapDepthMm > 0
   const nearbyComponent: Omit<NearbyComponent, "freeSpaceByDirection"> = {
     name: component.name,
     bounds: component.bounds,
-    relation,
     edgeDistanceMm,
-    overlapDepthMm,
-    directions:
-      relation === "overlapping"
-        ? getOverlapDirections(component.bounds, regionBounds)
-        : getOutsideDirections(component.bounds, regionBounds),
+    directions: overlapsRegion
+      ? getOverlapDirections(component.bounds, regionBounds)
+      : getOutsideDirections(component.bounds, regionBounds),
+    ...(overlapsRegion ? { overlapDepthMm } : {}),
   }
 
   if (
-    relation === "overlapping" &&
+    overlapsRegion &&
     isContainedWithinBounds(component.bounds, regionBounds)
   ) {
     nearbyComponent.containedWithinBounds = true
   } else if (
-    relation === "overlapping" &&
+    overlapsRegion &&
     doesRegionFitWithinComponent(component.bounds, regionBounds)
   ) {
     nearbyComponent.regionWithinComponent = true
@@ -249,13 +247,13 @@ export const getNearbyComponents = (
     )
     .filter(
       (component) =>
-        component.relation === "overlapping" ||
+        component.overlapDepthMm !== undefined ||
         component.edgeDistanceMm <= maxDistanceMm,
     )
     .sort(
       (a, b) =>
         a.edgeDistanceMm - b.edgeDistanceMm ||
-        b.overlapDepthMm - a.overlapDepthMm ||
+        (b.overlapDepthMm ?? 0) - (a.overlapDepthMm ?? 0) ||
         a.name.localeCompare(b.name),
     )
 }

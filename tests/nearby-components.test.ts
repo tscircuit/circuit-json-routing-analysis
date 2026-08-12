@@ -84,9 +84,9 @@ test("uses physical bounds and excludes components beyond the nearby threshold",
   ])
   expect(nearbyComponents[1]).toMatchObject({
     name: "LargeBody",
-    relation: "nearby",
     directions: ["right"],
   })
+  expect(nearbyComponents[1]?.overlapDepthMm).toBeUndefined()
   expect(nearbyComponents[1]?.edgeDistanceMm).toBeCloseTo(0.2)
   expect(nearbyComponents[2]?.edgeDistanceMm).toBeCloseTo(0.7)
   expect(
@@ -106,7 +106,6 @@ test("reports overlap depth separately from the displayed edge distance", () => 
 
   expect(overlappingComponent).toMatchObject({
     name: "Overlap",
-    relation: "overlapping",
     edgeDistanceMm: 0,
     overlapDepthMm: 1,
     directions: ["right"],
@@ -136,9 +135,7 @@ test("serializes non-negative distances and clear overlap information", () => {
     circuitJson as unknown as CircuitJson,
   ).getString()
 
-  expect(text).toContain(
-    'name="Overlap" relation="overlapping" edgeDistance="0mm" overlapDepth="1mm"',
-  )
+  expect(text).toContain('name="Overlap" edgeDistance="0mm" overlapDepth="1mm"')
   expect(text).not.toMatch(/(?:edgeDistance|overlapDepth)="-/)
   expect(text).not.toContain('name="Diagonal"')
   expect(text).not.toContain('name="Far"')

@@ -38,9 +38,8 @@ export interface DirectionalFreeSpace {
 export interface NearbyComponent {
   name: string
   bounds: Bounds
-  relation: "overlapping" | "nearby"
   edgeDistanceMm: number
-  overlapDepthMm: number
+  overlapDepthMm?: number
   directions: NearbyComponentDirection[]
   containedWithinBounds?: true
   regionWithinComponent?: true

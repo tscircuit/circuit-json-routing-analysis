@@ -79,11 +79,10 @@ const getProbabilityOfFailure = (
 const nearbyComponentToString = (component: NearbyComponent): string => {
   const attrs = [
     `name="${xmlEscape(component.name)}"`,
-    `relation="${component.relation}"`,
     `edgeDistance="${fmtMeasurementMm(component.edgeDistanceMm)}"`,
   ]
 
-  if (component.overlapDepthMm > 0) {
+  if (component.overlapDepthMm !== undefined) {
     attrs.push(`overlapDepth="${fmtMeasurementMm(component.overlapDepthMm)}"`)
   }
 
