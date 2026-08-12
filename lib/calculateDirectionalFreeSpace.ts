@@ -1,6 +1,6 @@
 import Flatbush from "flatbush"
 import { doBoundsIntersect, translateBounds, type Direction } from "./bounds"
-import type { Bounds } from "./types"
+import type { Bounds, DirectionalFreeSpace } from "./types"
 
 export interface SpatialComponent {
   name: string
@@ -69,9 +69,9 @@ const getFreeSpaceForDirection = (
   spatialIndex: ComponentSpatialIndex,
   componentIndex: number,
   direction: Direction,
-): string => {
+): DirectionalFreeSpace => {
   if (hasCollisionAtDistance(spatialIndex, componentIndex, direction, 0)) {
-    return "0.0mm"
+    return { distanceMm: 0, isAtLeast: false }
   }
 
   if (
@@ -82,7 +82,7 @@ const getFreeSpaceForDirection = (
       MAX_FREE_SPACE_MM,
     )
   ) {
-    return ">5mm"
+    return { distanceMm: MAX_FREE_SPACE_MM, isAtLeast: true }
   }
 
   let low = 0
@@ -101,15 +101,16 @@ const getFreeSpaceForDirection = (
     }
   }
 
-  return `${low.toFixed(1)}mm`
+  return { distanceMm: low, isAtLeast: false }
 }
 
 export const getDirectionalFreeSpace = (
   spatialIndex: ComponentSpatialIndex,
   componentIndex: number,
   directions: Direction[],
-): Partial<Record<Direction, string>> => {
-  const freeSpaceByDirection: Partial<Record<Direction, string>> = {}
+): Partial<Record<Direction, DirectionalFreeSpace>> => {
+  const freeSpaceByDirection: Partial<Record<Direction, DirectionalFreeSpace>> =
+    {}
 
   for (const direction of directions) {
     freeSpaceByDirection[direction] = getFreeSpaceForDirection(

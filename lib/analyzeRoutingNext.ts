@@ -30,7 +30,16 @@ const fmtNumber = (value: number): string => {
 
 const fmtMm = (value: number): string => `${value.toFixed(1)}mm`
 
+const fmtMeasurementMm = (value: number): string => `${fmtNumber(value)}mm`
+
 const fmtPercent = (value: number): string => `${fmtNumber(value * 100)}%`
+
+const xmlEscape = (value: string): string =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
 
 const isCrampedPortPoint = (portPointId?: string): boolean =>
   portPointId?.includes("_cramped") ?? false
@@ -68,46 +77,44 @@ const getProbabilityOfFailure = (
 }
 
 const nearbyComponentToString = (component: NearbyComponent): string => {
-  const attrs = [`name="${component.name}"`]
+  const attrs = [
+    `name="${xmlEscape(component.name)}"`,
+    `edgeDistance="${fmtMeasurementMm(component.edgeDistanceMm)}"`,
+  ]
+
+  if (component.overlapDepthMm !== undefined) {
+    attrs.push(`overlapDepth="${fmtMeasurementMm(component.overlapDepthMm)}"`)
+  }
+
+  if (component.directions.length > 0) {
+    attrs.push(`directions="${component.directions.join(",")}"`)
+  }
 
   if (component.containedWithinBounds) attrs.push("containedWithinBounds")
   if (component.regionWithinComponent) attrs.push("regionWithinComponent")
-  if (component.onLeftEdgeOfRegion) attrs.push("onLeftEdgeOfRegion")
-  if (component.onRightEdgeOfRegion) attrs.push("onRightEdgeOfRegion")
-  if (component.onTopEdgeOfRegion) attrs.push("onTopEdgeOfRegion")
-  if (component.onBottomEdgeOfRegion) attrs.push("onBottomEdgeOfRegion")
 
-  if (component.distToLeftEdgeOfRegion) {
-    attrs.push(`distToLeftEdgeOfRegion="${component.distToLeftEdgeOfRegion}"`)
-  }
-  if (component.distToRightEdgeOfRegion) {
-    attrs.push(`distToRightEdgeOfRegion="${component.distToRightEdgeOfRegion}"`)
-  }
-  if (component.distToTopOfRegion) {
-    attrs.push(`distToTopOfRegion="${component.distToTopOfRegion}"`)
-  }
-  if (component.distToBottomOfRegion) {
-    attrs.push(`distToBottomOfRegion="${component.distToBottomOfRegion}"`)
+  const addFreeSpaceAttribute = (
+    direction: keyof NearbyComponent["freeSpaceByDirection"],
+    attributeName: string,
+  ): void => {
+    const freeSpace = component.freeSpaceByDirection[direction]
+    if (!freeSpace) return
+
+    attrs.push(
+      `${attributeName}="${freeSpace.isAtLeast ? ">" : ""}${fmtMm(freeSpace.distanceMm)}"`,
+    )
   }
 
-  if (component.freeSpaceOnLeft) {
-    attrs.push(`freeSpaceOnLeft="${component.freeSpaceOnLeft}"`)
-  }
-  if (component.freeSpaceOnRight) {
-    attrs.push(`freeSpaceOnRight="${component.freeSpaceOnRight}"`)
-  }
-  if (component.freeSpaceAbove) {
-    attrs.push(`freeSpaceAbove="${component.freeSpaceAbove}"`)
-  }
-  if (component.freeSpaceBelow) {
-    attrs.push(`freeSpaceBelow="${component.freeSpaceBelow}"`)
-  }
+  addFreeSpaceAttribute("left", "freeSpaceOnLeft")
+  addFreeSpaceAttribute("right", "freeSpaceOnRight")
+  addFreeSpaceAttribute("top", "freeSpaceAbove")
+  addFreeSpaceAttribute("bottom", "freeSpaceBelow")
 
   attrs.push(
-    `left="${fmtMm(component.minX)}"`,
-    `right="${fmtMm(component.maxX)}"`,
-    `bottom="${fmtMm(component.minY)}"`,
-    `top="${fmtMm(component.maxY)}"`,
+    `left="${fmtMm(component.bounds.minX)}"`,
+    `right="${fmtMm(component.bounds.maxX)}"`,
+    `bottom="${fmtMm(component.bounds.minY)}"`,
+    `top="${fmtMm(component.bounds.maxY)}"`,
   )
 
   return `    <NearbyComponent ${attrs.join(" ")} />`

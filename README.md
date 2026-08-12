@@ -26,19 +26,15 @@ console.log(analysis.getString())
 Current snapshot from [`tests/examples/arduino-uno/arduino-uno.test.tsx`](./tests/examples/arduino-uno/arduino-uno.test.tsx), generated from [`tests/examples/arduino-uno/arduino-uno.circuit.json`](./tests/examples/arduino-uno/arduino-uno.circuit.json):
 
 ```xml
-<CongestedRegion probabilityOfFailure="10.8%" left="-6.1mm" right="5.1mm" bottom="-6.4mm" top="5.8mm" width="11.2mm" height="12.2mm">
-    <NearbyComponent name="C3" onTopEdgeOfRegion distToLeftEdgeOfRegion="1.6mm" distToRightEdgeOfRegion="8.0mm" freeSpaceOnLeft=">5mm" freeSpaceOnRight="3.4mm" freeSpaceAbove=">5mm" left="-4.5mm" right="-2.9mm" bottom="5.8mm" top="6.4mm" />
-    <NearbyComponent name="R1" onTopEdgeOfRegion distToLeftEdgeOfRegion="6.6mm" distToRightEdgeOfRegion="3.0mm" freeSpaceOnLeft="3.4mm" freeSpaceOnRight=">5mm" freeSpaceAbove=">5mm" left="0.5mm" right="2.1mm" bottom="5.8mm" top="6.4mm" />
-    <NearbyComponent name="LED_PWR" onBottomEdgeOfRegion distToLeftEdgeOfRegion="4.1mm" distToRightEdgeOfRegion="4.6mm" freeSpaceOnLeft="1.0mm" freeSpaceOnRight=">5mm" freeSpaceBelow=">5mm" left="-1.9mm" right="0.5mm" bottom="-7.4mm" top="-6.4mm" />
-    <NearbyComponent name="U1" onRightEdgeOfRegion distToTopOfRegion="0.5mm" distToBottomOfRegion="1.3mm" freeSpaceOnRight=">5mm" freeSpaceAbove=">5mm" freeSpaceBelow=">5mm" left="5.1mm" right="15.5mm" bottom="-5.1mm" top="5.3mm" />
-    <NearbyComponent name="R2" distToBottomOfRegion="0.2mm" freeSpaceOnLeft=">5mm" freeSpaceOnRight="1.0mm" freeSpaceBelow=">5mm" left="-4.5mm" right="-2.9mm" bottom="-7.2mm" top="-6.6mm" />
+<CongestedRegion probabilityOfFailure="2.7%" left="-4.6mm" right="-4.5mm" bottom="-18.7mm" top="-18.2mm" width="0.1mm" height="0.5mm">
+    <NearbyComponent name="C11" edgeDistance="0mm" directions="left" freeSpaceOnLeft="3.1mm" freeSpaceAbove=">5.0mm" freeSpaceBelow="4.7mm" left="-7.4mm" right="-4.6mm" bottom="-18.7mm" top="-17.3mm" />
+    <NearbyComponent name="J_PWR" edgeDistance="4.68mm" directions="bottom" freeSpaceOnLeft=">5.0mm" freeSpaceOnRight="3.6mm" freeSpaceBelow=">5.0mm" left="-7.1mm" right="12.2mm" bottom="-24.9mm" top="-23.4mm" />
+    <NearbyComponent name="U4" edgeDistance="4.688mm" directions="left,top" freeSpaceOnLeft="4.6mm" freeSpaceAbove=">5.0mm" left="-16.2mm" right="-7.8mm" bottom="-14.8mm" top="-9.2mm" />
 </CongestedRegion>
 
-<CongestedRegion probabilityOfFailure="8.1%" left="6.7mm" right="13.9mm" bottom="-3.4mm" top="3.6mm" width="7.1mm" height="7.1mm">
-    <NearbyComponent name="U1" regionWithinComponent freeSpaceOnLeft=">5mm" freeSpaceOnRight=">5mm" freeSpaceAbove=">5mm" freeSpaceBelow=">5mm" left="5.1mm" right="15.5mm" bottom="-5.1mm" top="5.3mm" />
-    <NearbyComponent name="C7" onTopEdgeOfRegion distToLeftEdgeOfRegion="-25.5mm" distToRightEdgeOfRegion="31.1mm" freeSpaceOnLeft=">5mm" freeSpaceOnRight=">5mm" freeSpaceAbove="2.9mm" left="-18.8mm" right="-17.2mm" bottom="3.7mm" top="4.3mm" />
-    <NearbyComponent name="LED_L" distToRightEdgeOfRegion="11.2mm" distToBottomOfRegion="1.0mm" freeSpaceOnRight=">5mm" freeSpaceBelow=">5mm" left="25.1mm" right="27.5mm" bottom="-5.4mm" top="-4.4mm" />
-    <NearbyComponent name="R3" distToRightEdgeOfRegion="7.7mm" distToBottomOfRegion="1.1mm" freeSpaceOnRight="2.0mm" freeSpaceBelow=">5mm" left="21.5mm" right="23.1mm" bottom="-5.2mm" top="-4.6mm" />
+<CongestedRegion probabilityOfFailure="2.1%" left="-18.9mm" right="-18.4mm" bottom="6.9mm" top="7.3mm" width="0.6mm" height="0.4mm">
+    <NearbyComponent name="U2" edgeDistance="0mm" directions="top" freeSpaceOnLeft="4.8mm" freeSpaceOnRight=">5.0mm" freeSpaceAbove=">5.0mm" left="-22.7mm" right="-13.3mm" bottom="7.3mm" top="14.7mm" />
+    <NearbyComponent name="C7" edgeDistance="2.55mm" directions="bottom" freeSpaceOnLeft=">5.0mm" freeSpaceOnRight=">5.0mm" freeSpaceBelow="2.8mm" left="-18.8mm" right="-17.2mm" bottom="3.7mm" top="4.3mm" />
 </CongestedRegion>
 ```
 

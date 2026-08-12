@@ -18,6 +18,42 @@ export const getBoundsHeight = (bounds: Bounds): number =>
 export const doBoundsIntersect = (a: Bounds, b: Bounds): boolean =>
   !(a.maxX < b.minX || a.minX > b.maxX || a.maxY < b.minY || a.minY > b.maxY)
 
+export const getEdgeDistanceBetweenBounds = (a: Bounds, b: Bounds): number => {
+  const dx = Math.max(a.minX - b.maxX, b.minX - a.maxX, 0)
+  const dy = Math.max(a.minY - b.maxY, b.minY - a.maxY, 0)
+
+  return Math.hypot(dx, dy)
+}
+
+export const getBoundsComparisonTolerance = (...bounds: Bounds[]): number => {
+  const coordinateScale = Math.max(
+    1,
+    ...bounds.flatMap((bound) => [
+      Math.abs(bound.minX),
+      Math.abs(bound.maxX),
+      Math.abs(bound.minY),
+      Math.abs(bound.maxY),
+    ]),
+  )
+
+  return Number.EPSILON * coordinateScale * 16
+}
+
+export const getOverlapDepthBetweenBounds = (a: Bounds, b: Bounds): number => {
+  const overlapWidth = Math.min(a.maxX, b.maxX) - Math.max(a.minX, b.minX)
+  const overlapHeight = Math.min(a.maxY, b.maxY) - Math.max(a.minY, b.minY)
+  const comparisonTolerance = getBoundsComparisonTolerance(a, b)
+
+  if (
+    overlapWidth <= comparisonTolerance ||
+    overlapHeight <= comparisonTolerance
+  ) {
+    return 0
+  }
+
+  return Math.min(overlapWidth, overlapHeight)
+}
+
 export const isContainedWithinBounds = (
   componentBounds: Bounds,
   regionBounds: Bounds,
