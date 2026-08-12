@@ -28,33 +28,25 @@ export interface Bounds {
   maxY: number
 }
 
-export interface NearbyComponent {
-  name: string
-  minX: number
-  maxX: number
-  minY: number
-  maxY: number
-  containedWithinBounds?: true
-  regionWithinComponent?: true
-  onLeftEdgeOfRegion?: true
-  onRightEdgeOfRegion?: true
-  onTopEdgeOfRegion?: true
-  onBottomEdgeOfRegion?: true
-  distToLeftEdgeOfRegion?: string
-  distToRightEdgeOfRegion?: string
-  distToTopOfRegion?: string
-  distToBottomOfRegion?: string
-  freeSpaceOnLeft?: string
-  freeSpaceOnRight?: string
-  freeSpaceAbove?: string
-  freeSpaceBelow?: string
+export type NearbyComponentDirection = "left" | "right" | "top" | "bottom"
+
+export interface DirectionalFreeSpace {
+  distanceMm: number
+  isAtLeast: boolean
 }
 
-export interface NearbyComponentOffsetFromRegion extends NearbyComponent {
-  offsetFromLeftEdgeOfRegion?: string
-  offsetFromRightEdgeOfRegion?: string
-  offsetFromTopEdgeOfRegion?: string
-  offsetFromBottomEdgeOfRegion?: string
+export interface NearbyComponent {
+  name: string
+  bounds: Bounds
+  relation: "overlapping" | "nearby"
+  edgeDistanceMm: number
+  overlapDepthMm: number
+  directions: NearbyComponentDirection[]
+  containedWithinBounds?: true
+  regionWithinComponent?: true
+  freeSpaceByDirection: Partial<
+    Record<NearbyComponentDirection, DirectionalFreeSpace>
+  >
 }
 
 export interface CongestedRegion {
