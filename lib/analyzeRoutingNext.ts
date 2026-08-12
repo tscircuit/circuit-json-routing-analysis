@@ -1,6 +1,7 @@
 import type { CircuitJson } from "circuit-json"
 import { getBoundsFromNode, getBoundsHeight, getBoundsWidth } from "./bounds"
 import { getNearbyComponents } from "./getNearbyComponents"
+import { mergeCongestedCapacityRegions } from "./mergeCongestedCapacityRegions"
 import { solveForGlobalCapacityNodes } from "./solveForGlobalCapacityNodes"
 import type {
   AnalysisLineItem,
@@ -141,24 +142,33 @@ export const analyzeGlobalCapacityNodes = (
     0,
   )
 
-  const lineItems: CongestedRegion[] = nodes
+  const candidates = nodes
     .filter((node) => node.portPoints.length > 0)
     .map((node) => {
       const bounds = getBoundsFromNode(node)
       return {
-        lineItemType: "CongestedRegion" as const,
-        probabilityOfFailure: fmtPercent(
-          getProbabilityOfFailure(node, maxDensity, maxPortPointCount),
-        ),
+        node,
         bounds,
-        width: getBoundsWidth(bounds),
-        height: getBoundsHeight(bounds),
-        nearbyComponents: Array.isArray(circuitJson)
-          ? getNearbyComponents(circuitJson as CircuitElement[], bounds)
-          : [],
+        probabilityOfFailure: getProbabilityOfFailure(
+          node,
+          maxDensity,
+          maxPortPointCount,
+        ),
       }
     })
-    .filter((lineItem) => Number.parseFloat(lineItem.probabilityOfFailure) > 0)
+    .filter((candidate) => candidate.probabilityOfFailure > 0)
+
+  const lineItems: CongestedRegion[] = mergeCongestedCapacityRegions(candidates)
+    .map((region) => ({
+      lineItemType: "CongestedRegion" as const,
+      probabilityOfFailure: fmtPercent(region.probabilityOfFailure),
+      bounds: region.bounds,
+      width: getBoundsWidth(region.bounds),
+      height: getBoundsHeight(region.bounds),
+      nearbyComponents: Array.isArray(circuitJson)
+        ? getNearbyComponents(circuitJson as CircuitElement[], region.bounds)
+        : [],
+    }))
     .sort(
       (a, b) =>
         Number.parseFloat(b.probabilityOfFailure) -
