@@ -51,9 +51,6 @@ const clamp01 = (value: number): number => Math.max(0, Math.min(1, value))
 const roundProbability = (value: number): number =>
   Number.parseFloat(value.toFixed(3))
 
-const getSeverityScore = (probabilityOfFailure: number): number =>
-  Number.parseFloat((probabilityOfFailure * 100).toFixed(1))
-
 const getSeverity = (probabilityOfFailure: number): CongestionSeverity => {
   if (probabilityOfFailure >= 0.05) return "critical"
   if (probabilityOfFailure >= 0.02) return "high"
@@ -101,7 +98,8 @@ const compareCongestedRegions = (
   a: CongestedRegion,
   b: CongestedRegion,
 ): number =>
-  b.severityScore - a.severityScore ||
+  Number.parseFloat(b.probabilityOfFailure) -
+    Number.parseFloat(a.probabilityOfFailure) ||
   b.metrics.overlappingComponentCount - a.metrics.overlappingComponentCount ||
   b.metrics.maxOverlapDepthMm - a.metrics.maxOverlapDepthMm ||
   b.metrics.traceCount - a.metrics.traceCount ||
@@ -187,7 +185,7 @@ const lineItemToString = (lineItem: AnalysisLineItem): string => {
   switch (lineItem.lineItemType) {
     case "CongestedRegion":
       return [
-        `<CongestedRegion severity="${lineItem.severity}" severityScore="${fmtNumber(lineItem.severityScore)}" probabilityOfFailure="${lineItem.probabilityOfFailure}" traceCount="${lineItem.metrics.traceCount}" netCount="${lineItem.metrics.netCount}" availableLayerCount="${lineItem.metrics.availableLayerCount}" overlappingComponentCount="${lineItem.metrics.overlappingComponentCount}" maxOverlapDepth="${fmtMeasurementMm(lineItem.metrics.maxOverlapDepthMm)}" left="${fmtMm(lineItem.bounds.minX)}" right="${fmtMm(lineItem.bounds.maxX)}" bottom="${fmtMm(lineItem.bounds.minY)}" top="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
+        `<CongestedRegion severity="${lineItem.severity}" probabilityOfFailure="${lineItem.probabilityOfFailure}" traceCount="${lineItem.metrics.traceCount}" netCount="${lineItem.metrics.netCount}" availableLayerCount="${lineItem.metrics.availableLayerCount}" overlappingComponentCount="${lineItem.metrics.overlappingComponentCount}" maxOverlapDepth="${fmtMeasurementMm(lineItem.metrics.maxOverlapDepthMm)}" left="${fmtMm(lineItem.bounds.minX)}" right="${fmtMm(lineItem.bounds.maxX)}" bottom="${fmtMm(lineItem.bounds.minY)}" top="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
         ...lineItem.nearbyComponents.map(nearbyComponentToString),
         "</CongestedRegion>",
       ].join("\n")
@@ -238,7 +236,6 @@ export const analyzeGlobalCapacityNodes = (
         lineItemType: "CongestedRegion" as const,
         probabilityOfFailure: fmtPercent(region.probabilityOfFailure),
         severity: getSeverity(region.probabilityOfFailure),
-        severityScore: getSeverityScore(region.probabilityOfFailure),
         metrics: getCongestionMetrics(region.nodes, nearbyComponents),
         bounds: region.bounds,
         width: getBoundsWidth(region.bounds),

@@ -90,7 +90,7 @@ test("returns merged regions with deterministic severity ranking and metrics", (
   expect(regions).toHaveLength(2)
   expect(regions[0]).toMatchObject({
     severity: "critical",
-    severityScore: 100,
+    probabilityOfFailure: "100%",
     metrics: {
       traceCount: 2,
       netCount: 2,
@@ -99,9 +99,11 @@ test("returns merged regions with deterministic severity ranking and metrics", (
       maxOverlapDepthMm: 0,
     },
   })
-  expect(regions[1]?.severityScore).toBeLessThan(regions[0]!.severityScore)
+  expect(Number.parseFloat(regions[1]!.probabilityOfFailure)).toBeLessThan(
+    Number.parseFloat(regions[0]!.probabilityOfFailure),
+  )
   expect(analysis.getString()).toContain(
-    '<CongestedRegion severity="critical" severityScore="100"',
+    '<CongestedRegion severity="critical" probabilityOfFailure="100%"',
   )
 })
 

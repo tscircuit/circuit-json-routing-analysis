@@ -62,7 +62,6 @@ export interface CongestedRegion {
   lineItemType: "CongestedRegion"
   probabilityOfFailure: string
   severity: CongestionSeverity
-  severityScore: number
   metrics: CongestionMetrics
   bounds: Bounds
   width: number
