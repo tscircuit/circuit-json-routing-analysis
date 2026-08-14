@@ -51,7 +51,7 @@ export interface NearbyComponent {
 export type CongestionSeverity = "critical" | "high" | "medium" | "low"
 
 export interface CongestionMetrics {
-  traceCount: number
+  connectionCount: number
   netCount: number
   componentsIntersectingRegion: number
 }

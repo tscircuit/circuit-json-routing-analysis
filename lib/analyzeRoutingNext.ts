@@ -62,12 +62,14 @@ const getCongestionMetrics = (
   nodes: RoutingCapacityNode[],
   nearbyComponents: NearbyComponent[],
 ): CongestionMetrics => {
-  const traceNames = new Set<string>()
+  const connectionNames = new Set<string>()
   const netNames = new Set<string>()
 
   for (const node of nodes) {
     for (const portPoint of node.portPoints) {
-      if (portPoint.connectionName) traceNames.add(portPoint.connectionName)
+      if (portPoint.connectionName) {
+        connectionNames.add(portPoint.connectionName)
+      }
       const netName = portPoint.rootConnectionName ?? portPoint.connectionName
       if (netName) netNames.add(netName)
     }
@@ -78,7 +80,7 @@ const getCongestionMetrics = (
   )
 
   return {
-    traceCount: traceNames.size,
+    connectionCount: connectionNames.size,
     netCount: netNames.size,
     componentsIntersectingRegion: overlappingComponents.length,
   }
@@ -92,7 +94,7 @@ const compareCongestedRegions = (
     Number.parseFloat(a.probabilityOfFailure) ||
   b.metrics.componentsIntersectingRegion -
     a.metrics.componentsIntersectingRegion ||
-  b.metrics.traceCount - a.metrics.traceCount ||
+  b.metrics.connectionCount - a.metrics.connectionCount ||
   b.metrics.netCount - a.metrics.netCount ||
   a.bounds.minX - b.bounds.minX ||
   a.bounds.minY - b.bounds.minY ||
@@ -174,7 +176,7 @@ const lineItemToString = (lineItem: AnalysisLineItem): string => {
   switch (lineItem.lineItemType) {
     case "CongestedRegion":
       return [
-        `<CongestedRegion severity="${lineItem.severity}" probabilityOfFailure="${lineItem.probabilityOfFailure}" traceCount="${lineItem.metrics.traceCount}" netCount="${lineItem.metrics.netCount}" componentsIntersectingRegion="${lineItem.metrics.componentsIntersectingRegion}" left="${fmtMm(lineItem.bounds.minX)}" right="${fmtMm(lineItem.bounds.maxX)}" bottom="${fmtMm(lineItem.bounds.minY)}" top="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
+        `<CongestedRegion severity="${lineItem.severity}" probabilityOfFailure="${lineItem.probabilityOfFailure}" connectionCount="${lineItem.metrics.connectionCount}" netCount="${lineItem.metrics.netCount}" componentsIntersectingRegion="${lineItem.metrics.componentsIntersectingRegion}" left="${fmtMm(lineItem.bounds.minX)}" right="${fmtMm(lineItem.bounds.maxX)}" bottom="${fmtMm(lineItem.bounds.minY)}" top="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
         ...lineItem.nearbyComponents.map(nearbyComponentToString),
         "</CongestedRegion>",
       ].join("\n")

@@ -92,7 +92,7 @@ test("returns merged regions with deterministic severity ranking and metrics", (
     severity: "critical",
     probabilityOfFailure: "100%",
     metrics: {
-      traceCount: 2,
+      connectionCount: 2,
       netCount: 2,
       componentsIntersectingRegion: 0,
     },
