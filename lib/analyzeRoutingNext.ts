@@ -5,6 +5,8 @@ import { mergeCongestedCapacityRegions } from "./mergeCongestedCapacityRegions"
 import { solveForGlobalCapacityNodes } from "./solveForGlobalCapacityNodes"
 import type {
   AnalysisLineItem,
+  CongestionMetrics,
+  CongestionSeverity,
   CongestedRegion,
   NearbyComponent,
   RoutingCapacityNode,
@@ -48,6 +50,56 @@ const clamp01 = (value: number): number => Math.max(0, Math.min(1, value))
 
 const roundProbability = (value: number): number =>
   Number.parseFloat(value.toFixed(3))
+
+const getSeverity = (probabilityOfFailure: number): CongestionSeverity => {
+  if (probabilityOfFailure >= 0.05) return "critical"
+  if (probabilityOfFailure >= 0.02) return "high"
+  if (probabilityOfFailure >= 0.01) return "medium"
+  return "low"
+}
+
+const getCongestionMetrics = (
+  nodes: RoutingCapacityNode[],
+  nearbyComponents: NearbyComponent[],
+): CongestionMetrics => {
+  const connectionNames = new Set<string>()
+  const netNames = new Set<string>()
+
+  for (const node of nodes) {
+    for (const portPoint of node.portPoints) {
+      if (portPoint.connectionName) {
+        connectionNames.add(portPoint.connectionName)
+      }
+      const netName = portPoint.rootConnectionName ?? portPoint.connectionName
+      if (netName) netNames.add(netName)
+    }
+  }
+
+  const overlappingComponents = nearbyComponents.filter(
+    (component) => component.overlapDepthMm !== undefined,
+  )
+
+  return {
+    connectionCount: connectionNames.size,
+    netCount: netNames.size,
+    componentsIntersectingRegion: overlappingComponents.length,
+  }
+}
+
+const compareCongestedRegions = (
+  a: CongestedRegion,
+  b: CongestedRegion,
+): number =>
+  Number.parseFloat(b.probabilityOfFailure) -
+    Number.parseFloat(a.probabilityOfFailure) ||
+  b.metrics.componentsIntersectingRegion -
+    a.metrics.componentsIntersectingRegion ||
+  b.metrics.connectionCount - a.metrics.connectionCount ||
+  b.metrics.netCount - a.metrics.netCount ||
+  a.bounds.minX - b.bounds.minX ||
+  a.bounds.minY - b.bounds.minY ||
+  a.bounds.maxX - b.bounds.maxX ||
+  a.bounds.maxY - b.bounds.maxY
 
 const getNodeDensity = (node: RoutingCapacityNode): number => {
   const layerCount = Math.max(node.availableZ?.length ?? 1, 1)
@@ -124,7 +176,7 @@ const lineItemToString = (lineItem: AnalysisLineItem): string => {
   switch (lineItem.lineItemType) {
     case "CongestedRegion":
       return [
-        `<CongestedRegion probabilityOfFailure="${lineItem.probabilityOfFailure}" left="${fmtMm(lineItem.bounds.minX)}" right="${fmtMm(lineItem.bounds.maxX)}" bottom="${fmtMm(lineItem.bounds.minY)}" top="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
+        `<CongestedRegion severity="${lineItem.severity}" probabilityOfFailure="${lineItem.probabilityOfFailure}" connectionCount="${lineItem.metrics.connectionCount}" netCount="${lineItem.metrics.netCount}" componentsIntersectingRegion="${lineItem.metrics.componentsIntersectingRegion}" left="${fmtMm(lineItem.bounds.minX)}" right="${fmtMm(lineItem.bounds.maxX)}" bottom="${fmtMm(lineItem.bounds.minY)}" top="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
         ...lineItem.nearbyComponents.map(nearbyComponentToString),
         "</CongestedRegion>",
       ].join("\n")
@@ -166,21 +218,23 @@ export const analyzeGlobalCapacityNodes = (
     .filter((candidate) => candidate.probabilityOfFailure > 0)
 
   const lineItems: CongestedRegion[] = mergeCongestedCapacityRegions(candidates)
-    .map((region) => ({
-      lineItemType: "CongestedRegion" as const,
-      probabilityOfFailure: fmtPercent(region.probabilityOfFailure),
-      bounds: region.bounds,
-      width: getBoundsWidth(region.bounds),
-      height: getBoundsHeight(region.bounds),
-      nearbyComponents: Array.isArray(circuitJson)
+    .map((region) => {
+      const nearbyComponents = Array.isArray(circuitJson)
         ? getNearbyComponents(circuitJson as CircuitElement[], region.bounds)
-        : [],
-    }))
-    .sort(
-      (a, b) =>
-        Number.parseFloat(b.probabilityOfFailure) -
-        Number.parseFloat(a.probabilityOfFailure),
-    )
+        : []
+
+      return {
+        lineItemType: "CongestedRegion" as const,
+        probabilityOfFailure: fmtPercent(region.probabilityOfFailure),
+        severity: getSeverity(region.probabilityOfFailure),
+        metrics: getCongestionMetrics(region.nodes, nearbyComponents),
+        bounds: region.bounds,
+        width: getBoundsWidth(region.bounds),
+        height: getBoundsHeight(region.bounds),
+        nearbyComponents,
+      }
+    })
+    .sort(compareCongestedRegions)
 
   return {
     getLineItems: () => lineItems,
