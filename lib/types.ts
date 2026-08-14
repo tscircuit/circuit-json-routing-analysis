@@ -48,9 +48,22 @@ export interface NearbyComponent {
   >
 }
 
+export type CongestionSeverity = "critical" | "high" | "medium" | "low"
+
+export interface CongestionMetrics {
+  traceCount: number
+  netCount: number
+  availableLayerCount: number
+  overlappingComponentCount: number
+  maxOverlapDepthMm: number
+}
+
 export interface CongestedRegion {
   lineItemType: "CongestedRegion"
   probabilityOfFailure: string
+  severity: CongestionSeverity
+  severityScore: number
+  metrics: CongestionMetrics
   bounds: Bounds
   width: number
   height: number

@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test"
+import type { CircuitJson } from "circuit-json"
 import { analyzeGlobalCapacityNodes } from "../lib/analyzeRoutingNext"
 import type { RoutingCapacityNode } from "../lib/types"
 
@@ -49,5 +50,101 @@ test("merges duplicate congestion regions without merging distinct regions", () 
     maxX: 12,
     minY: -2,
     maxY: 2,
+  })
+})
+
+test("returns merged regions with deterministic severity ranking and metrics", () => {
+  const higherTrafficNode: RoutingCapacityNode = {
+    ...createNode({ id: "higher-traffic", x: 10, connectionName: "trace-a" }),
+    availableZ: [0],
+    portPoints: [
+      {
+        portPointId: "higher-traffic-a_cramped",
+        x: 10,
+        y: 0,
+        z: 0,
+        connectionName: "trace-a",
+        rootConnectionName: "net-a",
+      },
+      {
+        portPointId: "higher-traffic-b_cramped",
+        x: 10,
+        y: 0,
+        z: 0,
+        connectionName: "trace-b",
+        rootConnectionName: "net-b",
+      },
+    ],
+  }
+  const lowerTrafficNode: RoutingCapacityNode = {
+    ...createNode({ id: "lower-traffic", x: 0, connectionName: "trace-c" }),
+    availableZ: [0, 1],
+  }
+
+  const analysis = analyzeGlobalCapacityNodes([
+    lowerTrafficNode,
+    higherTrafficNode,
+  ])
+  const regions = analysis.getLineItems()
+
+  expect(regions).toHaveLength(2)
+  expect(regions[0]).toMatchObject({
+    severity: "critical",
+    severityScore: 100,
+    metrics: {
+      traceCount: 2,
+      netCount: 2,
+      availableLayerCount: 1,
+      overlappingComponentCount: 0,
+      maxOverlapDepthMm: 0,
+    },
+  })
+  expect(regions[1]?.severityScore).toBeLessThan(regions[0]!.severityScore)
+  expect(analysis.getString()).toContain(
+    '<CongestedRegion severity="critical" severityScore="100"',
+  )
+})
+
+test("uses stable geometric ordering when severity metrics are equal", () => {
+  const analysis = analyzeGlobalCapacityNodes([
+    createNode({ id: "right", x: 10, connectionName: "trace-right" }),
+    createNode({ id: "left", x: -10, connectionName: "trace-left" }),
+  ])
+
+  expect(analysis.getLineItems().map((region) => region.bounds.minX)).toEqual([
+    -12, 8,
+  ])
+})
+
+test("uses component overlap to rank regions with equal failure scores", () => {
+  const circuitJson = [
+    {
+      type: "source_component",
+      source_component_id: "source_component_blocker",
+      name: "Blocker",
+    },
+    {
+      type: "pcb_component",
+      pcb_component_id: "pcb_component_blocker",
+      source_component_id: "source_component_blocker",
+      center: { x: 10, y: 0 },
+      width: 2,
+      height: 2,
+    },
+  ] as unknown as CircuitJson
+  const analysis = analyzeGlobalCapacityNodes(
+    [
+      createNode({ id: "clear", x: -10, connectionName: "trace-clear" }),
+      createNode({ id: "blocked", x: 10, connectionName: "trace-blocked" }),
+    ],
+    circuitJson,
+  )
+
+  expect(analysis.getLineItems()[0]).toMatchObject({
+    bounds: { minX: 8, maxX: 12 },
+    metrics: {
+      overlappingComponentCount: 1,
+      maxOverlapDepthMm: 2,
+    },
   })
 })
