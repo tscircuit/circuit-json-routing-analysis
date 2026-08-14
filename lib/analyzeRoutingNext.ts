@@ -76,21 +76,11 @@ const getCongestionMetrics = (
   const overlappingComponents = nearbyComponents.filter(
     (component) => component.overlapDepthMm !== undefined,
   )
-  const availableLayerCount = Math.min(
-    ...nodes.map((node) => Math.max(node.availableZ?.length ?? 1, 1)),
-  )
 
   return {
     traceCount: traceNames.size,
     netCount: netNames.size,
-    availableLayerCount,
-    overlappingComponentCount: overlappingComponents.length,
-    maxOverlapDepthMm: Math.max(
-      0,
-      ...overlappingComponents.map(
-        (component) => component.overlapDepthMm ?? 0,
-      ),
-    ),
+    componentsIntersectingRegion: overlappingComponents.length,
   }
 }
 
@@ -100,11 +90,10 @@ const compareCongestedRegions = (
 ): number =>
   Number.parseFloat(b.probabilityOfFailure) -
     Number.parseFloat(a.probabilityOfFailure) ||
-  b.metrics.overlappingComponentCount - a.metrics.overlappingComponentCount ||
-  b.metrics.maxOverlapDepthMm - a.metrics.maxOverlapDepthMm ||
+  b.metrics.componentsIntersectingRegion -
+    a.metrics.componentsIntersectingRegion ||
   b.metrics.traceCount - a.metrics.traceCount ||
   b.metrics.netCount - a.metrics.netCount ||
-  a.metrics.availableLayerCount - b.metrics.availableLayerCount ||
   a.bounds.minX - b.bounds.minX ||
   a.bounds.minY - b.bounds.minY ||
   a.bounds.maxX - b.bounds.maxX ||
@@ -185,7 +174,7 @@ const lineItemToString = (lineItem: AnalysisLineItem): string => {
   switch (lineItem.lineItemType) {
     case "CongestedRegion":
       return [
-        `<CongestedRegion severity="${lineItem.severity}" probabilityOfFailure="${lineItem.probabilityOfFailure}" traceCount="${lineItem.metrics.traceCount}" netCount="${lineItem.metrics.netCount}" availableLayerCount="${lineItem.metrics.availableLayerCount}" overlappingComponentCount="${lineItem.metrics.overlappingComponentCount}" maxOverlapDepth="${fmtMeasurementMm(lineItem.metrics.maxOverlapDepthMm)}" left="${fmtMm(lineItem.bounds.minX)}" right="${fmtMm(lineItem.bounds.maxX)}" bottom="${fmtMm(lineItem.bounds.minY)}" top="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
+        `<CongestedRegion severity="${lineItem.severity}" probabilityOfFailure="${lineItem.probabilityOfFailure}" traceCount="${lineItem.metrics.traceCount}" netCount="${lineItem.metrics.netCount}" componentsIntersectingRegion="${lineItem.metrics.componentsIntersectingRegion}" left="${fmtMm(lineItem.bounds.minX)}" right="${fmtMm(lineItem.bounds.maxX)}" bottom="${fmtMm(lineItem.bounds.minY)}" top="${fmtMm(lineItem.bounds.maxY)}" width="${fmtMm(lineItem.width)}" height="${fmtMm(lineItem.height)}">`,
         ...lineItem.nearbyComponents.map(nearbyComponentToString),
         "</CongestedRegion>",
       ].join("\n")

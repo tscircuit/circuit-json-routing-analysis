@@ -94,9 +94,7 @@ test("returns merged regions with deterministic severity ranking and metrics", (
     metrics: {
       traceCount: 2,
       netCount: 2,
-      availableLayerCount: 1,
-      overlappingComponentCount: 0,
-      maxOverlapDepthMm: 0,
+      componentsIntersectingRegion: 0,
     },
   })
   expect(Number.parseFloat(regions[1]!.probabilityOfFailure)).toBeLessThan(
@@ -145,8 +143,11 @@ test("uses component overlap to rank regions with equal failure scores", () => {
   expect(analysis.getLineItems()[0]).toMatchObject({
     bounds: { minX: 8, maxX: 12 },
     metrics: {
-      overlappingComponentCount: 1,
-      maxOverlapDepthMm: 2,
+      componentsIntersectingRegion: 1,
     },
+  })
+  expect(analysis.getLineItems()[0]?.nearbyComponents[0]).toMatchObject({
+    name: "Blocker",
+    overlapDepthMm: 2,
   })
 })

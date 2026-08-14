@@ -53,9 +53,7 @@ export type CongestionSeverity = "critical" | "high" | "medium" | "low"
 export interface CongestionMetrics {
   traceCount: number
   netCount: number
-  availableLayerCount: number
-  overlappingComponentCount: number
-  maxOverlapDepthMm: number
+  componentsIntersectingRegion: number
 }
 
 export interface CongestedRegion {
