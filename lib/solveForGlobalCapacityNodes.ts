@@ -1,4 +1,4 @@
-import { AutoroutingPipelineSolver } from "@tscircuit/capacity-autorouter"
+import { CapacityMeshRoutingAnalysisSolver } from "@tscircuit/capacity-autorouter"
 import type { CircuitJson } from "circuit-json"
 import { getSimpleRouteJsonFromCircuitJson } from "@tscircuit/core"
 
@@ -7,11 +7,16 @@ export const solveForGlobalCapacityNodes = async (circuitJson: CircuitJson) => {
     circuitJson: circuitJson as any,
   })
 
-  const solver = new AutoroutingPipelineSolver(simpleRouteJson as any, {
+  const solver = new CapacityMeshRoutingAnalysisSolver(simpleRouteJson as any, {
     effort: 1,
   })
 
-  await solver.solveUntilPhase("highDensityRouteSolver")
+  solver.solve()
+  if (solver.failed) {
+    throw new Error(
+      `Capacity mesh routing analysis failed: ${solver.error ?? "unknown error"}`,
+    )
+  }
 
-  return solver.uniformPortDistributionSolver?.getOutput() ?? []
+  return solver.getOutput()
 }
